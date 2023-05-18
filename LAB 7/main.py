@@ -50,17 +50,17 @@ def compare_algorithms(nodes):
         kruskal_times.append(kruskal_time)
 
     # Plot the results
-    plt.figure(figsize=(10, 6))
-    plt.plot(nodes, prim_times, label="Prim's Algorithm")
-    plt.plot(nodes, kruskal_times, label="Kruskal's Algorithm")
+    plt.figure(figsize=(10, 6), facecolor='lightgray')
+    plt.plot(nodes, prim_times, label="Prim's Algorithm", color = 'red')
+    plt.plot(nodes, kruskal_times, label="Kruskal's Algorithm", color = 'blue')
     plt.xlabel('Number of Nodes')
-    plt.ylabel('Execution Time (seconds)')
-    plt.title('Performance of Prim\'s and Kruskal\'s Algorithms')
+    plt.ylabel('Execution Time')
+    plt.title('Performance of both algorithms')
     plt.legend()
     plt.grid(True)
     plt.show()
 
-nodes = [100, 500, 1000, 2000]
+nodes = [50, 100, 500, 1000, 2000]
 compare_algorithms(nodes)
 
 nodes = 10

@@ -1,18 +1,74 @@
-from mpmath import mp
+import networkx as nx
+import random
+import time
+import matplotlib.pyplot as plt
 
-def calculate_pi_digit(n):
-    # Set the precision to include the desired digit plus a few extra digits
-    mp.dps = n + 10
+def generate_random_graph(nodes):
+    edge_prob = 0.1  # Smaller probability for a sparse graph
 
-    # Calculate pi using Machin's formula
-    pi = 4 * (4 * mp.atan(1/5) - mp.atan(1/239))
+    graph = nx.fast_gnp_random_graph(nodes, edge_prob)
 
-    # Extract the n-th digit from the calculated pi
-    digit = int(str(pi)[n+2])
+    for (u, v, w) in graph.edges(data=True):
+        w['weight'] = random.randint(1, 100)
 
-    return digit
+    return graph
 
-# Example usage
-n = 5  # Calculate the 1000th digit of pi
-digit = calculate_pi_digit(n)
-print(f"The {n}th digit of pi is: {digit}")
+
+def run_prim_algorithm(graph):
+    start_time = time.time()
+    mst = nx.minimum_spanning_tree(graph, algorithm='prim')
+    end_time = time.time()
+    return mst, end_time - start_time
+
+
+def run_kruskal_algorithm(graph):
+    start_time = time.time()
+    mst = nx.minimum_spanning_tree(graph, algorithm='kruskal')
+    end_time = time.time()
+    return mst, end_time - start_time
+
+
+def draw_graph(graph, mst, algorithm):
+    pos = nx.spring_layout(graph)
+    nx.draw_networkx(graph, pos, with_labels=False, node_size=100)
+    nx.draw_networkx_edges(graph, pos, edgelist=mst.edges(), width=2, edge_color='r')
+    plt.title(f'MST using {algorithm}')
+    plt.show()
+
+
+def compare_algorithms(nodes):
+    prim_times = []
+    kruskal_times = []
+
+    for n in nodes:
+        graph = generate_random_graph(n)
+
+        _, prim_time = run_prim_algorithm(graph)
+        prim_times.append(prim_time)
+
+        _, kruskal_time = run_kruskal_algorithm(graph)
+        kruskal_times.append(kruskal_time)
+
+    # Plot the results
+    plt.figure(figsize=(10, 6))
+    plt.plot(nodes, prim_times, label="Prim's Algorithm")
+    plt.plot(nodes, kruskal_times, label="Kruskal's Algorithm")
+    plt.xlabel('Number of Nodes')
+    plt.ylabel('Execution Time (seconds)')
+    plt.title('Performance of Prim\'s and Kruskal\'s Algorithms')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+nodes = [100, 500, 1000, 2000]
+compare_algorithms(nodes)
+
+nodes = 10
+
+graph = generate_random_graph(nodes)
+
+mst_prim, _ = run_prim_algorithm(graph)
+draw_graph(graph, mst_prim, "Prim's Algorithm")
+
+mst_kruskal, _ = run_kruskal_algorithm(graph)
+draw_graph(graph, mst_kruskal, "Kruskal's Algorithm")
